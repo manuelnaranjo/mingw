@@ -1,0 +1,5 @@
+((name mingw-w64) (size_expanded (TB 42))
+ (version ((%{VER}) Stable 1))
+ (packager_email adrien@notk.org) (packager_name "Adrien Nader")
+ (description "Header set for mingw-w64.")
+ (host %{HST}) (target (%{TGT})) (predicates ()) (comments ()))
