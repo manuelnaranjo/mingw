@@ -65,16 +65,6 @@ case "$ARCH" in
     *)    TARGET=$ARCH-slackware-linux ;;
 esac
 
-if [ "${BUILD}" != "${HST}" ]; then
-  if [ "${HST}" = "i686-w64-mingw32" ]; then
-    SLKCFLAGS="-O2"
-    LIBDIRSUFFIX=""
-  elif [ "${HST}" = "x86_64-w64-mingw32" ]; then
-    SLKCFLAGS="-O2"
-    LIBDIRSUFFIX="64"
-  fi
-fi
-
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-$PKGNAM
@@ -101,8 +91,8 @@ CFLAGS="$SLKCFLAGS" \
   --mandir=${YYPREFIX}/man \
   --infodir=${YYPREFIX}/info \
   --with-docdir=${YYPREFIX}/doc/$PKGNAM-$VERSION \
-  --build=${BUILD} \
-  --host=${HST} \
+  --build=${BUILD_TRIPLET} \
+  --host=${TARGET_TRIPLET} \
   ${WITH_CRT} \
   || exit 1
 
@@ -119,8 +109,8 @@ gzip -9 $PKG${YYPREFIX}/info/*
 chown -R root:root $PKG${YYPREFIX}/doc/$PKGNAM-$VERSION
 
 cat ${CWD}/$PKGNAM.yypkg.meta | sed \
-  -e "s/%{HST}/${HST}/" \
-  -e "s/%{TGT}/${TGT}/" \
+  -e "s/%{HST}/${HOST_TRIPLET}/" \
+  -e "s/%{TGT}/${TARGET_TRIPLET}/" \
   -e "s/%{VER}/$(echo ${VERSION} | tr . ' ')/" \
-  | makeypkg.native -o ${YYOUTPUT} -meta - ${PKG}${YYPREFIX}
+  | makeypkg -o ${YYOUTPUT} -meta - ${PKG}${YYPREFIX}
 
