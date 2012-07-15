@@ -1,0 +1,5 @@
+((name win-iconv) (size_expanded (TB 42))
+ (version ((%{VER}) Stable 1))
+ (packager_email adrien@notk.org) (packager_name "Adrien Nader")
+ (description "Win32-based iconv implementation")
+ (host %{HST}) (target (%{TGT})) (predicates ()) (comments ()))
