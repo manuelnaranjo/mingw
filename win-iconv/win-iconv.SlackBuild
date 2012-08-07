@@ -74,9 +74,9 @@ CFLAGS="$SLKCFLAGS" \
 
 mkdir -p ${PKG}/${PREFIX}/{bin,include,lib${LIBDIRSUFFIX}}
 
-cp -a win_iconv.exe ${PKG}/${PREFIX}/bin
+cp -a iconv.dll win_iconv.exe ${PKG}/${PREFIX}/bin
 cp -a iconv.{def,h} ${PKG}/${PREFIX}/include
-cp -a libiconv.dll.a iconv.dll ${PKG}/${PREFIX}/lib${LIBDIRSUFFIX}
+cp -a libiconv.dll.a ${PKG}/${PREFIX}/lib${LIBDIRSUFFIX}
 
 # Strip binaries:
 ( cd $PKG
