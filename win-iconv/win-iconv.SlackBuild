@@ -47,8 +47,6 @@ case "${HOST_TRIPLET}" in
 esac
 
 CWD=$(pwd)
-# Temporary build location.  This should *NOT* be a directory
-# path a non-root user could create later...
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-$PKGNAM
 rm -rf $PKG
@@ -65,23 +63,33 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
+# Avoid a C++-style comments which are not C90
+sed -i 's;#endif//_LIBICONV_H;#endif;' iconv.h
+#endif//_LIBICONV_H
+
+
+sed -i '/^#/ ! s/\<iconv\.dll\>/libiconv.dll/g' Makefile
+
+sed -i -- \
+  "s,\(-DDEFAULT_LIBICONV_DLL\)=\(\\\$(DEFAULT_LIBICONV_DLL)\),\1=\'\"\2\"\'," \
+  Makefile
+
 CFLAGS="$SLKCFLAGS" \
   CC=${HOST_TRIPLET}-gcc \
   AR=${HOST_TRIPLET}-ar \
   RANLIB=${HOST_TRIPLET}-ranlib \
   DLLTOOL=${HOST_TRIPLET}-dlltool \
+  DEFAULT_LIBICONV_DLL=libiconv.dll \
   make -j2
 
 mkdir -p ${PKG}/${PREFIX}/{bin,include,lib${LIBDIRSUFFIX}}
 
-cp -a iconv.dll win_iconv.exe ${PKG}/${PREFIX}/bin
+cp -a libiconv.dll win_iconv.exe ${PKG}/${PREFIX}/bin
 cp -a iconv.{def,h} ${PKG}/${PREFIX}/include
 cp -a libiconv.dll.a ${PKG}/${PREFIX}/lib${LIBDIRSUFFIX}
 
 # Strip binaries:
-( cd $PKG
-  find . | xargs file | egrep "executable|shared object" | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : | xargs ${HOST_STRIP} --strip-debug 2> /dev/null
-)
+find ${PKG} | xargs file | egrep "executable|shared object" | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : | xargs ${HOST_STRIP} --strip-debug 2> /dev/null
 
 mkdir -p $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
 cp -a readme.txt $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
