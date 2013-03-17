@@ -88,9 +88,11 @@ gzip -9 $PKG/${PREFIX}/info/*
 
 chown -R root:root $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
 
-cat ${CWD}/$PKGNAM.yypkg.meta | sed \
+cat ${CWD}/$PKGNAM.yypkg.script | sed \
+  -e "s/%{PKG}/${PKGNAM}/" \
   -e "s/%{HST}/${HOST_TRIPLET}/" \
   -e "s/%{TGT}/${TARGET_TRIPLET}/" \
   -e "s/%{VER}/$(echo ${VERSION} | tr . ' ')/" \
-  | makeypkg -o ${YYOUTPUT} -meta - ${PKG}/${PREFIX}
+  -e "s/%{BUILD}/${BUILD}/" \
+  | makeypkg -o ${YYOUTPUT} -script - ${PKG}/${PREFIX}
 

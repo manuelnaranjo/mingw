@@ -105,10 +105,11 @@ fi
 # The source tarball comes from windows and has all its file +x...
 find "${PKG}/${PREFIX}" -type f | xargs chmod -x
 
-cat ${CWD}/${PKGNAM}.yypkg.meta | sed \
+cat ${CWD}/${PKGNAM}.yypkg.script | sed \
+  -e "s/%{PKG}/${PKGNAM}/" \
   -e "s/%{HST}/${HOST_TRIPLET}/" \
   -e "s/%{TGT}//" \
   -e "s/%{VER}/$(echo ${VERSION} | tr . ' ')/" \
   -e "s/%{BUILD}/${BUILD}/" \
-  | makeypkg -o ${YYOUTPUT} -meta - "${PKG}/${PREFIX}"
+  | makeypkg -o ${YYOUTPUT} -script - "${PKG}/${PREFIX}"
 
