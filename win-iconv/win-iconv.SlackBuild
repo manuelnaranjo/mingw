@@ -80,7 +80,7 @@ CFLAGS="$SLKCFLAGS" \
   RANLIB=${HOST_TRIPLET}-ranlib \
   DLLTOOL=${HOST_TRIPLET}-dlltool \
   DEFAULT_LIBICONV_DLL=libiconv.dll \
-  make -j2
+  make -j1
 
 mkdir -p ${PKG}/${PREFIX}/{bin,include,lib${LIBDIRSUFFIX}}
 
