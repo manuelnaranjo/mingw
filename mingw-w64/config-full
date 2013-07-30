@@ -1,3 +1,1 @@
-# export HST="${TRIPLET}"
-# export TGT="${TRIPLET}"
 export WITH_CRT=""
