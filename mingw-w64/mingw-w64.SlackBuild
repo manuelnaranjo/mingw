@@ -66,8 +66,8 @@ find . \
 
 CFLAGS="$SLKCFLAGS" \
 ./configure \
-  --prefix=/${PREFIX} \
-  --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
+  --prefix=/${PREFIX}/${TARGET_TRIPLET} \
+  --libdir=/${PREFIX}/${TARGET_TRIPLET}/lib${LIBDIRSUFFIX} \
   --mandir=/${PREFIX}/man \
   --infodir=/${PREFIX}/info \
   --with-docdir=/${PREFIX}/doc/$PKGNAM-$VERSION \
