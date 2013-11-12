@@ -54,7 +54,7 @@ mkdir -p $TMP $PKG
 
 cd $TMP
 rm -rf $PKGNAM-$VERSION
-tar xvf $CWD/$PKGNAM-$VERSION.tar.gz
+tar xvf $CWD/$PKGNAM-$VERSION.tar.bz2
 cd $PKGNAM-$VERSION
 
 chown -R root:root .
