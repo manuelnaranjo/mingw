@@ -60,7 +60,7 @@ cd $PKGNAM-$VERSION
 chown -R root:root .
 chmod -R u+w,go+r-w,a-s .
 
-CFLAGS="$SLKCFLAGS" \
+CFLAGS="-O2" \
 ./configure \
   --prefix=/${PREFIX}/${TARGET_TRIPLET} \
   --libdir=/${PREFIX}/${TARGET_TRIPLET}/lib${LIBDIRSUFFIX} \
