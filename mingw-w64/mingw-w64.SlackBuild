@@ -75,6 +75,10 @@ CFLAGS="-O2" \
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
+if [ ! -e "$PKG/${PREFIX}/mingw" ]; then
+  (cd "${PKG}/${PREFIX}"; ln -s "${TARGET_TRIPLET}" "mingw")
+fi
+
 find $PKG | xargs file | grep -e "executable" -e "shared object" \
   | grep ${TARGET_EXE_FORMAT} | cut -f 1 -d : | xargs ${TARGET_STRIP} --strip-unneeded 2> /dev/null
 
