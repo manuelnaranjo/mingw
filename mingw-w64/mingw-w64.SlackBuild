@@ -94,5 +94,5 @@ cat ${CWD}/$PKGNAM.yypkg.script | sed \
   -e "s/%{TGT}/${TARGET_TRIPLET}/" \
   -e "s/%{VER}/${VERSION}/" \
   -e "s/%{BUILD}/${BUILD}/" \
-  | makeypkg -o ${YYOUTPUT} -script - ${PKG}/${PREFIX}
+  | yypkg --makepkg --output ${YYOUTPUT} --script - --directory "${PKG}/${PREFIX}"
 
