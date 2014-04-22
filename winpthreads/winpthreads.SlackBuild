@@ -55,14 +55,14 @@ find . \
 CFLAGS="-O2" \
 CXXFLAGS="-O2" \
 ./configure \
-  --prefix=/${PREFIX} \
-  --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
+  --prefix=/${PREFIX}/${TARGET_TRIPLET} \
+  --libdir=/${PREFIX}/${TARGET_TRIPLET}/lib \
   --sysconfdir=/${PREFIX}/etc \
   --localstatedir=/${PREFIX}/var \
   --infodir=/${PREFIX}/info \
   --mandir=/${PREFIX}/man \
   --disable-static \
-  --build=$ARCH-slackware-linux \
+  --build=${BUILD_TRIPLET} \
   --host=${TARGET_TRIPLET}
 
 make -j4 || exit 1
