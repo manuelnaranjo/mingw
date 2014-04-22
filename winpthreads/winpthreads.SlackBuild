@@ -63,7 +63,7 @@ CXXFLAGS="-O2" \
   --mandir=/${PREFIX}/man \
   --disable-static \
   --build=$ARCH-slackware-linux \
-  --host=${HOST_TRIPLET}
+  --host=${TARGET_TRIPLET}
 
 make -j4 || exit 1
 make DESTDIR=$PKG install
