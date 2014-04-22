@@ -35,11 +35,6 @@ if [ -z "$ARCH" ]; then
   esac
 fi
 
-case "${HOST_TRIPLET}" in
-  i686-w64-mingw32) LIBDIRSUFFIX="" ;;
-  x86_64-w64-mingw32) LIBDIRSUFFIX="64" ;;
-esac
-
 CWD=$(pwd)
 # Temporary build location.  This should *NOT* be a directory
 # path a non-root user could create later...
