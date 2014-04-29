@@ -42,7 +42,7 @@ rm -rf $PKG
 mkdir -p $TMP $PKG
 
 cd $TMP
-rm -rf $PKGNAM-$VERSION
+rm -rf mingw-w64-$VERSION
 tar xvf $CWD/mingw-w64-$VERSION.tar.bz2 || exit 1
 cd mingw-w64-$VERSION/mingw-w64-libraries/winpthreads
 chown -R root:root .
