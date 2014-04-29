@@ -57,7 +57,7 @@ x86_64-w64-mingw32) CHAIN="mingw64" ;;
 esac
 
 sed -i \
-  -e '/^LINKFLAGS =/ s/LINKFLAGS/^\0/' \
+  -e 's;^\(LINKFLAGS =\) .*;\1;' \
   -e 's/\$(LINKFLAGS)//' \
   -e '/^flexlink.exe/ s/version_res.o//' \
 Makefile
