@@ -56,11 +56,15 @@ case "${TARGET_TRIPLET}" in
 x86_64-w64-mingw32) CHAIN="mingw64" ;;
 esac
 
+# PATCH
 sed -i \
   -e 's;^\(LINKFLAGS =\) .*;\1;' \
   -e 's/\$(LINKFLAGS)//' \
   -e '/^flexlink.exe/ s/version_res.o//' \
 Makefile
+
+# PATCH
+sed -i -e "/\/mingw\/lib/ s;$;\"/${YYPREFIX_TARGET}/lib${LIBDIRSUFFIX_TGT}\";" reloc.ml
 
 make CHAINS="${CHAIN}" || exit 1
 
