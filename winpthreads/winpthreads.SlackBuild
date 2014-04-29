@@ -61,7 +61,6 @@ CXXFLAGS="-O2" \
   --localstatedir=/${PREFIX}/var \
   --infodir=/${PREFIX}/info \
   --mandir=/${PREFIX}/man \
-  --disable-static \
   --build=${BUILD_TRIPLET} \
   --host=${TARGET_TRIPLET}
 
