@@ -56,15 +56,13 @@ case "${TARGET_TRIPLET}" in
 x86_64-w64-mingw32) CHAIN="mingw64" ;;
 esac
 
-sed -i "s/^CHAINS = .*/CHAINS = ${CHAIN}/" Makefile
-
 sed -i \
   -e '/^LINKFLAGS =/ s/LINKFLAGS/^\0/' \
   -e 's/\$(LINKFLAGS)//' \
   -e '/^flexlink.exe/ s/version_res.o//' \
 Makefile
 
-make || exit 1
+make CHAINS="${CHAIN}" || exit 1
 
 mkdir -p $PKG/${PREFIX}/bin $PKG/${PREFIX}/${TARGET_TRIPLET}/include
 cp flexlink.exe $PKG/${PREFIX}/bin/flexlink
