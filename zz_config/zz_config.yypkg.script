@@ -1,0 +1,12 @@
+(((name %{PKG}) (size_expanded (TB 42))
+  (version (%{VER} %{BUILD}))
+  (packager_email adrien@notk.org) (packager_name "Adrien Nader")
+  (description  "Configuration package for Win-builds") (host %{HST})
+  (target (%{TGT})) (predicates ()) (comments ()))
+ (
+  (fc-cache-can-fail (Exec (${YYPREFIX}/bin/fc-cache)))
+  (pango-querymodules-can-fail (Exec (${YYPREFIX}/bin/pango-querymodules)))
+  (gdk-pixbuf-query-loaders-can-fail (Exec (${YYPREFIX}/bin/gdk-pixbuf-query-loaders --update-cache)))
+  (gtk-query-immodules-2.0-can-fail (Exec (${YYPREFIX}/bin/gtk-query-immodules-2.0 --update-cache)))
+ )
+ ())
