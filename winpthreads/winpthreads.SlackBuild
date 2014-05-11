@@ -23,7 +23,7 @@
 
 PKGNAM=winpthreads
 VERSION=${VERSION:-$(echo mingw-w64-*.tar.bz2 | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 # Automatically determine the architecture we're building on:
 if [ -z "$ARCH" ]; then
@@ -71,6 +71,17 @@ CXXFLAGS="-O2" \
 
 make -j4 || exit 1
 make DESTDIR=$PKG install
+
+# Put winpthreads' dll in $(bindir):
+# Libtool does the installation of .dll files and puts them in $(bindir).
+# However $(bindir) inside libtool doesn't match $(bindir) in Makefile and
+# there is no way to tell libtool what the correct value is during
+# --mode=install (but there is during --mode=link; no idea what this is useful
+# for...).
+# Fixing it inside the build system is impossible without changing both
+# automake and libtool so give up and mv the DLLs by hand.
+mkdir -p ${PKG}/${PREFIX}/bin
+mv ${PKG}/${PREFIX}/${TARGET_TRIPLET}/bin/*.dll ${PKG}/${PREFIX}/bin
 
 # Strip binaries:
 ( cd $PKG
