@@ -54,7 +54,7 @@ find . \
 
 if [ x"${HOST_TRIPLET}" != x"${TARGET_TRIPLET}" ]; then
   mkdir -p fakelib
-  cp /${PREFIX}/${TARGET_TRIPLET}/lib/libm.a fakelib/libpthread.a
+  cp "/${PREFIX}/${TARGET_TRIPLET}/lib${LIBDIRSUFFIX_TGT}/libm.a" fakelib/libpthread.a
 fi
 
 CFLAGS="-O2" \
