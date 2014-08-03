@@ -24,7 +24,7 @@ set -x
 
 PKGNAM=mingw-w64
 VERSION=${VERSION:-$(find $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 # Automatically determine the architecture we're building on:
 MARCH=$( uname -m )
@@ -59,6 +59,8 @@ cd $PKGNAM-$VERSION
 
 chown -R root:root .
 chmod -R u+w,go+r-w,a-s .
+
+patch -p1 -i $CWD/0001-intrinsics-don-t-include-d-f-i-vec.h-from-inside-int.patch || exit 1
 
 CFLAGS="-O2" \
 ./configure \

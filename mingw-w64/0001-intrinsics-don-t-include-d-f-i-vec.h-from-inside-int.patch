@@ -1,0 +1,41 @@
+From db1590549fe2ec3b706d0c1ef6615d9e23570fa3 Mon Sep 17 00:00:00 2001
+From: Adrien Nader <adrien@notk.org>
+Date: Tue, 25 Feb 2014 22:16:30 +0000
+Subject: [PATCH] intrinsics: don't include {d,f,i}vec.h from inside intrin.h.
+
+Prior to this commit, #include <intrin.h> would automatically pull these
+*vec.h headers for C++. Depending on compiler options (architecture and
+optimizations), it would fail because they use functions which are only
+declared later on in intrin.h.
+
+Simply remove the inclusion of {d,f,i}vec.h from intrin.h since there is
+little reason to do so and other compilers don't seem to do it.
+
+This changes behaviour with previous mingw-w64 releases but only to make
+it more compatible with MSVC. I originally investigated the issue to fix
+a build of Qt 5.2.
+
+git-svn-id: svn+ssh://svn.code.sf.net/p/mingw-w64/code/trunk@6501 4407c894-4637-0410-b4f5-ada5f102cad1
+---
+ mingw-w64-headers/crt/intrin.h | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/mingw-w64-headers/crt/intrin.h b/mingw-w64-headers/crt/intrin.h
+index 6287610..2348e09 100644
+--- a/mingw-w64-headers/crt/intrin.h
++++ b/mingw-w64-headers/crt/intrin.h
+@@ -147,11 +147,6 @@ extern "C" {
+ }
+ #endif
+ 
+-#if defined(__cplusplus)
+-#include <dvec.h>
+-#include <fvec.h>
+-#include <ivec.h>
+-#endif
+ #endif
+ 
+ #define __MACHINEX64 __MACHINE
+-- 
+1.8.4
+
