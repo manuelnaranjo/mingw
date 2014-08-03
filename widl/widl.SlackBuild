@@ -53,9 +53,9 @@ rm -rf $PKG
 mkdir -p $TMP $PKG
 
 cd $TMP
-rm -rf $PKGNAM-$VERSION
-tar xvf $CWD/mingw-w64-$VERSION.tar.bz2 || exit 1
-cd mingw-w64-$VERSION/mingw-w64-tools/widl
+rm -rf $PKGNAM-v$VERSION
+tar xvf $CWD/mingw-w64-v$VERSION.tar.bz2 || exit 1
+cd mingw-w64-v$VERSION/mingw-w64-tools/widl
 chown -R root:root .
 find . \
   \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
