@@ -81,8 +81,9 @@ if [ ! -e "$PKG/${PREFIX}/mingw" ]; then
   (cd "${PKG}/${PREFIX}"; ln -s "${TARGET_TRIPLET}" "mingw")
 fi
 
-find $PKG | xargs file | grep -e "executable" -e "shared object" \
-  | grep ${TARGET_EXE_FORMAT} | cut -f 1 -d : | xargs ${TARGET_STRIP} --strip-unneeded 2> /dev/null
+find $PKG \! \( -name "*.h" \) | xargs file | grep -e "executable" -e "shared object" \
+  | grep ${TARGET_EXE_FORMAT} | cut -f 1 -d : \
+  | xargs ${TARGET_STRIP} --strip-unneeded 2> /dev/null || true
 
 # Compress info pages
 rm -f $PKG/${PREFIX}/info/dir
