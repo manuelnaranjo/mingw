@@ -20,7 +20,7 @@
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set -x
+set -ex
 
 PKGNAM=mingw-w64
 VERSION=${VERSION:-$(find $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
@@ -86,10 +86,14 @@ find $PKG \! \( -name "*.h" \) | xargs file | grep -e "executable" -e "shared ob
   | xargs ${TARGET_STRIP} --strip-unneeded 2> /dev/null || true
 
 # Compress info pages
-rm -f $PKG/${PREFIX}/info/dir
-gzip -9 $PKG/${PREFIX}/info/*
+if [ -e $PKG/${PREFIX}/info ]; then
+  rm -f $PKG/${PREFIX}/info/dir
+  gzip -9 $PKG/${PREFIX}/info/*
+fi
 
-chown -R root:root $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
+if [ -d $PKG/${PREFIX}/doc/$PKGNAM-$VERSION ]; then
+  chown -R root:root $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
+fi
 
 cat ${CWD}/$PKGNAM.yypkg.script | sed \
   -e "s/%{PKG}/${PKGNAM}/" \
