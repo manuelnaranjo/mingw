@@ -1,0 +1,124 @@
+#!/bin/sh
+
+# Copyright 2009, 2010, 2011, 2012  Patrick J. Volkerding, Sebeka, MN, USA
+# All rights reserved.
+
+#   Permission to use, copy, modify, and distribute this software for
+#   any purpose with or without fee is hereby granted, provided that
+#   the above copyright notice and this permission notice appear in all
+#   copies.
+#
+#   THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+#   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#   IN NO EVENT SHALL THE AUTHORS AND COPYRIGHT HOLDERS AND THEIR
+#   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+#   USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+#   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+#   SUCH DAMAGE.
+
+PKGNAM=genidl
+VERSION=${VERSION:-$(echo mingw-w64-*.tar.bz2 | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
+BUILD=${BUILD:-1}
+
+set -e
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp}
+PKG=$TMP/package-$PKGNAM
+rm -rf $PKG
+mkdir -p $TMP $PKG
+
+cd $TMP
+rm -rf mingw-w64-$VERSION
+WIDL_PATH="mingw-w64-$VERSION/mingw-w64-tools/genidl"
+time tar xvf $CWD/mingw-w64-$VERSION.tar.bz2 || exit 1
+cd ${WIDL_PATH}
+chown -R root:root .
+time find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \; -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \;
+
+# !PATCH
+# AC_FUNC_MALLOC and AC_FUNC_REALLOC test whether malloc(0) and realloc(0, 0)
+# are handled like in GNU and if not, they set this "#define malloc rpl_malloc"
+# and "#define realloc rpl_realloc" which stands for "replacement
+# malloc/realloc".
+# I can't tell if they're needed here (both because I don't know if
+# MS/mingw-w64 functions behave like in GNU and because I can't tell if json-c
+# requires such a behaviour. In any case, currently the replacement functions
+# are not provided which indicates they're probably not needed.
+# The way to avoid these defines is to remove the tests from configure.ac and
+# the defines from config.h.in but in order to avoid a lengthy autoreconf, this
+# only removes changes config.h.in.
+sed -i \
+  -e '/rpl_malloc/ d' \
+  -e '/rpl_realloc/ d' \
+  -e '/^#undef malloc/ d' \
+  -e '/^#undef realloc/ d' \
+  config.h.in
+
+CFLAGS="-O2" \
+CXXFLAGS="-O2" \
+./configure \
+  --prefix=/${PREFIX} \
+  --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
+  --sysconfdir=/${PREFIX}/etc \
+  --localstatedir=/${PREFIX}/var \
+  --infodir=/${PREFIX}/info \
+  --mandir=/${PREFIX}/man \
+  --build=${BUILD_TRIPLET} \
+  --host=${HOST_TRIPLET} \
+  --target=${TARGET_TRIPLET}
+
+make -j4 || exit 1
+make DESTDIR=$PKG install
+
+# Strip binaries:
+( cd $PKG
+  find . | xargs file | egrep "executable|shared object" | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : | xargs ${HOST_STRIP} --strip-debug 2> /dev/null
+)
+
+# Compress and link manpages, if any:
+if [ -d $PKG/${PREFIX}/man ]; then
+  ( cd $PKG/${PREFIX}/man
+    for manpagedir in $(find . -type d -name "man*") ; do
+      ( cd $manpagedir
+        for eachpage in $( find . -type l -maxdepth 1) ; do
+          ln -s $( readlink $eachpage ).gz $eachpage.gz
+          rm $eachpage
+        done
+        gzip -9 *.?
+      )
+    done
+  )
+fi
+
+mkdir -p $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
+cp -a \
+  ../../AUTHORS COPYING ../../DISCLAIMER* \
+  $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
+
+# If there's a ChangeLog, installing at least part of the recent history
+# is useful, but don't let it get totally out of control:
+if [ -r ChangeLog ]; then
+  DOCSDIR=$(echo $PKG/${PREFIX}/doc/${PKGNAM}-$VERSION)
+  cat ChangeLog | head -n 1000 > $DOCSDIR/ChangeLog
+  touch -r ChangeLog $DOCSDIR/ChangeLog
+fi
+
+cat ${CWD}/${PKGNAM}.yypkg.script | sed \
+  -e "s/%{PKG}/${PKGNAM}/" \
+  -e "s/%{HST}/${HOST_TRIPLET}/" \
+  -e "s/%{TGT}/${TARGET_TRIPLET}/" \
+  -e "s/%{VER}/${VERSION}/" \
+  -e "s/%{BUILD}/${BUILD}/" \
+  -e "s/%{DESCR}/${DESCR:-"No description"}/" \
+  | yypkg --makepkg --output ${YYOUTPUT} --script - --directory "${PKG}/${PREFIX}"
+
