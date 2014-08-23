@@ -25,43 +25,44 @@ PKGNAM=widl
 VERSION=${VERSION:-$(echo mingw-w64-*.tar.bz2 | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
-case "${HOST_TRIPLET}" in
-  i686-w64-mingw32)
-    LIBDIRSUFFIX=""
-    ;;
-  x86_64-w64-mingw32)
-    LIBDIRSUFFIX="64"
-    ;;
-esac
+set -e
 
 CWD=$(pwd)
-# Temporary build location.  This should *NOT* be a directory
-# path a non-root user could create later...
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-$PKGNAM
 rm -rf $PKG
 mkdir -p $TMP $PKG
 
 cd $TMP
-rm -rf $PKGNAM-$VERSION
-tar xvf $CWD/mingw-w64-$VERSION.tar.bz2 || exit 1
-cd mingw-w64-$VERSION/mingw-w64-tools/widl
+rm -rf mingw-w64-$VERSION
+WIDL_PATH="mingw-w64-$VERSION/mingw-w64-tools/widl"
+time tar xvf $CWD/mingw-w64-$VERSION.tar.bz2 || exit 1
+cd ${WIDL_PATH}
 chown -R root:root .
-find . \
+time find . \
   \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
   -exec chmod 755 {} \; -o \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
+
+# !PATCH
+# AC_FUNC_MALLOC and AC_FUNC_REALLOC test whether malloc(0) and realloc(0, 0)
+# are handled like in GNU and if not, they set this "#define malloc rpl_malloc"
+# and "#define realloc rpl_realloc" which stands for "replacement
+# malloc/realloc".
+# I can't tell if they're needed here (both because I don't know if
+# MS/mingw-w64 functions behave like in GNU and because I can't tell if json-c
+# requires such a behaviour. In any case, currently the replacement functions
+# are not provided which indicates they're probably not needed.
+# The way to avoid these defines is to remove the tests from configure.ac and
+# the defines from config.h.in but in order to avoid a lengthy autoreconf, this
+# only removes changes config.h.in.
+sed -i \
+  -e '/rpl_malloc/ d' \
+  -e '/rpl_realloc/ d' \
+  -e '/^#undef malloc/ d' \
+  -e '/^#undef realloc/ d' \
+  include/config.h.in
 
 CFLAGS="-O2" \
 CXXFLAGS="-O2" \
@@ -72,8 +73,7 @@ CXXFLAGS="-O2" \
   --localstatedir=/${PREFIX}/var \
   --infodir=/${PREFIX}/info \
   --mandir=/${PREFIX}/man \
-  --disable-static \
-  --build=$ARCH-slackware-linux \
+  --build=${BUILD_TRIPLET} \
   --host=${HOST_TRIPLET} \
   --target=${TARGET_TRIPLET}
 
@@ -102,7 +102,7 @@ fi
 
 mkdir -p $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
 cp -a \
-  ABOUT-NLS AUTHORS COPYING* INSTALL* NEWS PACKAGERS README* THANKS \
+  ../../AUTHORS ../../COPYING* ../../DISCLAIMER* VERSION \
   $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
 
 # If there's a ChangeLog, installing at least part of the recent history
@@ -116,9 +116,9 @@ fi
 cat ${CWD}/${PKGNAM}.yypkg.script | sed \
   -e "s/%{PKG}/${PKGNAM}/" \
   -e "s/%{HST}/${HOST_TRIPLET}/" \
-  -e "s/%{TGT}//" \
+  -e "s/%{TGT}/${TARGET_TRIPLET}/" \
   -e "s/%{VER}/${VERSION}/" \
   -e "s/%{BUILD}/${BUILD}/" \
   -e "s/%{DESCR}/${DESCR:-"No description"}/" \
-  | makeypkg -o ${YYOUTPUT} -script - "${PKG}/${PREFIX}"
+  | yypkg --makepkg --output ${YYOUTPUT} --script - --directory "${PKG}/${PREFIX}"
 
