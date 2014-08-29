@@ -1,1 +1,2 @@
 export WITH_CRT="--without-crt"
+export YYLOWCOMPRESS="yes"
