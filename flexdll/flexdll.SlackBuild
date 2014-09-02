@@ -52,8 +52,8 @@ chown -R root:root .
 chmod -R u+w,go+r-w,a-s .
 
 case "${TARGET_TRIPLET}" in
-  i686-w64-mingw32) CHAIN="mingw" ;;
-x86_64-w64-mingw32) CHAIN="mingw64" ;;
+  i686-w64-mingw*) CHAIN="mingw" ;;
+x86_64-w64-mingw*) CHAIN="mingw64" ;;
 esac
 
 # PATCH
