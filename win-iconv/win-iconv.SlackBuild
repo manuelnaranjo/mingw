@@ -61,10 +61,8 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
-# Avoid a C++-style comments which are not C90
+# Avoid a C++-style comment which is not C90
 sed -i 's;#endif//_LIBICONV_H;#endif;' iconv.h
-#endif//_LIBICONV_H
-
 
 sed -i '/^#/ ! s/\<iconv\.dll\>/libiconv.dll/g' Makefile
 
