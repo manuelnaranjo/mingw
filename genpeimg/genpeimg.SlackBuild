@@ -35,11 +35,10 @@ mkdir -p $TMP $PKG
 
 cd $TMP
 rm -rf mingw-w64-$VERSION
-WIDL_PATH="mingw-w64-$VERSION/mingw-w64-tools/genpeimg"
-time tar xvf $CWD/mingw-w64-$VERSION.tar.bz2 || exit 1
-cd ${WIDL_PATH}
+tar xvf $CWD/mingw-w64-$VERSION.tar.bz2 || exit 1
+cd mingw-w64-$VERSION/mingw-w64-tools/genpeimg
 chown -R root:root .
-time find . \
+find . \
   \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
   -exec chmod 755 {} \; -o \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
