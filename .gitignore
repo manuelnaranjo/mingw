@@ -6,5 +6,7 @@
 !gendef/mingw-w64-v*.tar.*
 !genidl/mingw-w64-v*.tar.*
 !genpeimg/mingw-w64-v*.tar.*
+!libmangle/mingw-w64-v*.tar.*
 !widl/mingw-w64-v*.tar.*
 !winpthreads/mingw-w64-v*.tar.*
+!winstorecompat/mingw-w64-v*.tar.*
