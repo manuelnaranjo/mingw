@@ -69,6 +69,7 @@ CFLAGS="-O2" \
   --mandir=/${PREFIX}/man \
   --infodir=/${PREFIX}/info \
   --with-docdir=/${PREFIX}/doc/$PKGNAM-$VERSION \
+  --enable-secure-api \
   --build=${BUILD_TRIPLET} \
   --host=${TARGET_TRIPLET} \
   ${WITH_CRT} \
