@@ -82,6 +82,10 @@ if [ ! -e "$PKG/${PREFIX}/mingw" ]; then
   (cd "${PKG}/${PREFIX}"; ln -s "${TARGET_TRIPLET}" "mingw")
 fi
 
+for sub in signal time unistd; do
+  echo '#warn Win-builds is built with winpthreads but you do not have winpthreads installed.' > $PKG/${PREFIX}/${TARGET_TRIPLET}/include/pthread_${sub}.h
+done
+
 find $PKG \! \( -name "*.h" \) | xargs file | grep -e "executable" -e "shared object" \
   | grep ${TARGET_EXE_FORMAT} | cut -f 1 -d : \
   | xargs ${TARGET_STRIP} --strip-unneeded 2> /dev/null || true
