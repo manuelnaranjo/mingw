@@ -24,8 +24,6 @@ if [ x"$1" = x"clean" ]; then
   unset YYPREFIX
   unset PKG_CONFIG_LIBDIR
 else
-  CYG='grep ^CYGWIN /proc/version'
-
   YYPREFIX="/@@PREFIX@@"
   YYPATH="${YYPREFIX}/bin"
   if [ ! -d "${YYPATH}" ]; then
@@ -35,7 +33,7 @@ else
 
   export PKG_CONFIG_LIBDIR="${YYPREFIX}/lib@@LIBDIRSUFFIX@@/pkgconfig"
 
-  if ! ${CYG} >/dev/null 2>/dev/null; then
+  if ! grep '^CYGWIN' /proc/version >/dev/null 2>/dev/null; then
     case ":${PATH}:" in
       *:/opt/windows_??/bin:*)
         PATH="$(echo "${PATH}" | sed "s;/opt/windows_../bin;${YYPATH};g")" ;;
