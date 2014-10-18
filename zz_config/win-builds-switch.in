@@ -19,6 +19,8 @@
 #_
 #_!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+export PKG_CONFIG_PATH=""
+
 if [ x"$1" = x"clean" ]; then
   export PATH="$(echo "${PATH}" | sed -e 's;/opt/windows_../bin;;g' -e 's/::/:/g')"
   unset YYPREFIX
