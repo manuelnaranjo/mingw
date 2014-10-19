@@ -115,7 +115,7 @@ fi
 cat ${CWD}/${PKGNAM}.yypkg.script | sed \
   -e "s/%{PKG}/${PKGNAM}/" \
   -e "s/%{HST}/${HOST_TRIPLET}/" \
-  -e "s/%{TGT}/${TARGET_TRIPLET}/" \
+  -e "s/%{TGT}//" \
   -e "s/%{VER}/${VERSION}/" \
   -e "s/%{BUILD}/${BUILD}/" \
   -e "s/%{DESCR}/${DESCR:-"No description"}/" \
