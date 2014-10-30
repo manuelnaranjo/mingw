@@ -30,7 +30,7 @@ if [ x"$1" = x"clean" ]; then
   export PATH="$(echo "${PATH}" | sed -e 's;/opt/windows_../bin;;g' -e 's/::/:/g')"
   echo 'Set ${PATH}='"${PATH}"'.' 1>&2
 else
-  YYPREFIX="/@@PREFIX@@"
+  YYPREFIX=!{YYPREFIX}
   YYPATH="${YYPREFIX}/bin"
   if [ ! -d "${YYPATH}" ]; then
     echo "The ${YYPATH} directory doesn't exist; there cannot be a valid setup there." 1>&2
@@ -40,18 +40,16 @@ else
   export PKG_CONFIG_LIBDIR="${YYPREFIX}/lib@@LIBDIRSUFFIX@@/pkgconfig"
   echo 'Set ${PKG_CONFIG_LIBDIR}='"${PKG_CONFIG_LIBDIR}"'.' 1>&2
 
+  export YYPREFIX
+  echo 'Set ${YYPREFIX}='"${YYPREFIX}"'.' 1>&2
+
   if ! grep '^CYGWIN' /proc/version >/dev/null 2>/dev/null; then
     case ":${PATH}:" in
       *:/opt/windows_??/bin:*)
         PATH="$(echo "${PATH}" | sed "s;/opt/windows_../bin;${YYPATH};g")" ;;
       *) PATH="${YYPATH}:${PATH}" ;;
     esac
-    export YYPREFIX
-    echo 'Set ${YYPREFIX}='"${YYPREFIX}"'.' 1>&2
     export PATH
     echo 'Set ${PATH}='"${PATH}"'.' 1>&2
-  else
-    export YYPREFIX="$(cygpath -m "${YYPREFIX}")"
-    echo 'Set ${YYPREFIX}='"${YYPREFIX}"'.' 1>&2
   fi
 fi

@@ -9,4 +9,7 @@
   (gdk-pixbuf-query-loaders-can-fail (Exec (${YYPREFIX}/bin/gdk-pixbuf-query-loaders --update-cache)))
   (gtk-query-immodules-2.0-can-fail (Exec (${YYPREFIX}/bin/gtk-query-immodules-2.0 --update-cache)))
  )
+ ((yyprefix_store
+    (SearchReplace ("bin/win-builds-switch" "!{YYPREFIX}" "${YYPREFIX}")))
+ )
  ())
