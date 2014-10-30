@@ -12,19 +12,23 @@
 #_  This means you have started this script as "win-builds-switch 64" (or 32)
 #_  while you need to prepend ". " in front of that command for it to be
 #_  effective:
-#_    . win-builds-switch 64
+#_    source win-builds-switch 64
 #_
 #_  (and before you ask, while your mistake has been noticed automatically, it
 #_  cannot be corrected automatically)
 #_
 #_!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-export PKG_CONFIG_PATH=""
+unset PKG_CONFIG_PATH
+echo 'Unset ${PKG_CONFIG_LIBDIR}.' 1>&2
 
 if [ x"$1" = x"clean" ]; then
-  export PATH="$(echo "${PATH}" | sed -e 's;/opt/windows_../bin;;g' -e 's/::/:/g')"
   unset YYPREFIX
+  echo 'Unset ${YYPREFIX}.' 1>&2
   unset PKG_CONFIG_LIBDIR
+  echo 'Unset ${PKG_CONFIG_LIBDIR}.' 1>&2
+  export PATH="$(echo "${PATH}" | sed -e 's;/opt/windows_../bin;;g' -e 's/::/:/g')"
+  echo 'Set ${PAT}='"${PAT}"'.' 1>&2
 else
   YYPREFIX="/@@PREFIX@@"
   YYPATH="${YYPREFIX}/bin"
@@ -34,6 +38,7 @@ else
   fi
 
   export PKG_CONFIG_LIBDIR="${YYPREFIX}/lib@@LIBDIRSUFFIX@@/pkgconfig"
+  echo 'Set ${PKG_CONFIG_LIBDIR}='"${PKG_CONFIG_LIBDIR}"'.' 1>&2
 
   if ! grep '^CYGWIN' /proc/version >/dev/null 2>/dev/null; then
     case ":${PATH}:" in
@@ -41,9 +46,12 @@ else
         PATH="$(echo "${PATH}" | sed "s;/opt/windows_../bin;${YYPATH};g")" ;;
       *) PATH="${YYPATH}:${PATH}" ;;
     esac
-    export PATH
     export YYPREFIX
+    echo 'Set ${YYPREFIX}='"${YYPREFIX}"'.' 1>&2
+    export PATH
+    echo 'Set ${PATH}='"${PATH}"'.' 1>&2
   else
     export YYPREFIX="$(cygpath -m "${YYPREFIX}")"
+    echo 'Set ${YYPREFIX}='"${YYPREFIX}"'.' 1>&2
   fi
 fi
