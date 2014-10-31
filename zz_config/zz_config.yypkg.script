@@ -4,12 +4,11 @@
   (description  "Configuration package for Win-builds") (host %{HST})
   (target (%{TGT})) (predicates ()) (comments ()))
  (
+  (yyprefix_store
+     (SearchReplace ("bin/win-builds-switch" "!{YYPREFIX}" "${YYPREFIX}")))
   (fc-cache-can-fail (Exec (${YYPREFIX}/bin/fc-cache)))
   (pango-querymodules-can-fail (Exec (${YYPREFIX}/bin/pango-querymodules --update-cache)))
   (gdk-pixbuf-query-loaders-can-fail (Exec (${YYPREFIX}/bin/gdk-pixbuf-query-loaders --update-cache)))
   (gtk-query-immodules-2.0-can-fail (Exec (${YYPREFIX}/bin/gtk-query-immodules-2.0 --update-cache)))
- )
- ((yyprefix_store
-    (SearchReplace ("bin/win-builds-switch" "!{YYPREFIX}" "${YYPREFIX}")))
  )
  ())

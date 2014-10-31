@@ -19,37 +19,40 @@
 #_
 #_!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+replace_in_path() {
+  local GLOB="${1}"
+  local RE="${2}"
+  local REPLACEMENT="${3}"
+
+  case ":${PATH}:" in
+    *:${GLOB}:*) PATH="$(echo "${PATH}" | sed "s;${RE};${REPLACEMENT};g")" ;;
+    *)           PATH="${REPLACEMENT}:${PATH}" ;;
+  esac
+  export PATH
+  echo 'Set ${PATH}='"${PATH}"'.' 1>&2
+}
+
 unset PKG_CONFIG_PATH
 echo 'Unset ${PKG_CONFIG_LIBDIR}.' 1>&2
 
 if [ x"$1" = x"clean" ]; then
-  unset YYPREFIX
-  echo 'Unset ${YYPREFIX}.' 1>&2
   unset PKG_CONFIG_LIBDIR
   echo 'Unset ${PKG_CONFIG_LIBDIR}.' 1>&2
   export PATH="$(echo "${PATH}" | sed -e 's;/opt/windows_../bin;;g' -e 's/::/:/g')"
   echo 'Set ${PATH}='"${PATH}"'.' 1>&2
 else
-  YYPREFIX=!{YYPREFIX}
-  YYPATH="${YYPREFIX}/bin"
-  if [ ! -d "${YYPATH}" ]; then
-    echo "The ${YYPATH} directory doesn't exist; there cannot be a valid setup there." 1>&2
-    return 1
+  if ! grep '^\(CYGWIN\|Linux\)' /proc/version >/dev/null 2>/dev/null; then
+    # MSYS
+    PKG_CONFIG_LIBDIR="!{YYPREFIX}/lib@@LIBDIRSUFFIX@@/pkgconfig"
+    SERIES="windows"
+  else
+    # Cygwin, Linux, possibly any other
+    PKG_CONFIG_LIBDIR="@@YYPREFIX_TARGET@@/lib@@LIBDIRSUFFIX@@/pkgconfig"
+    SERIES="cross_toolchain"
   fi
 
-  export PKG_CONFIG_LIBDIR="${YYPREFIX}/lib@@LIBDIRSUFFIX@@/pkgconfig"
+  export PKG_CONFIG_LIBDIR
   echo 'Set ${PKG_CONFIG_LIBDIR}='"${PKG_CONFIG_LIBDIR}"'.' 1>&2
 
-  export YYPREFIX
-  echo 'Set ${YYPREFIX}='"${YYPREFIX}"'.' 1>&2
-
-  if ! grep '^CYGWIN' /proc/version >/dev/null 2>/dev/null; then
-    case ":${PATH}:" in
-      *:/opt/windows_??/bin:*)
-        PATH="$(echo "${PATH}" | sed "s;/opt/windows_../bin;${YYPATH};g")" ;;
-      *) PATH="${YYPATH}:${PATH}" ;;
-    esac
-    export PATH
-    echo 'Set ${PATH}='"${PATH}"'.' 1>&2
-  fi
+  replace_in_path "/opt/${SERIES}_??/bin" "/opt/${SERIES}_../bin" "/${PREFIX}/bin"
 fi

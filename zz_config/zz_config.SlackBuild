@@ -35,6 +35,7 @@ mkdir -p $PKG/bin
 
 sed \
   -e 's;@@PREFIX@@;'"${PREFIX}"';g' \
+  -e 's;@@YYPREFIX_TARGET@@;'"${YYPREFIX_TARGET:-${YYPREFIX}}"';g' \
   -e 's;@@LIBDIRSUFFIX@@;'"${LIBDIRSUFFIX}"';g' \
   < ${CWD}/win-builds-switch.in \
   > $PKG/bin/win-builds-switch
