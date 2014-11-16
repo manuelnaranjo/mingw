@@ -33,10 +33,22 @@ mkdir -p $PKG
 
 mkdir -p $PKG/bin
 
+case "${TARGET_TRIPLET}" in
+  i686-*-mingw*)
+    BITS="32"
+    LIBDIRSUFFIX=""
+    ;;
+  x86_64-*-mingw*)
+    BITS="64"
+    LIBDIRSUFFIX="64"
+    ;;
+esac
+
 sed \
   -e 's;@@PREFIX@@;'"${PREFIX}"';g' \
   -e 's;@@YYPREFIX_TARGET@@;'"${YYPREFIX_TARGET:-${YYPREFIX}}"';g' \
   -e 's;@@LIBDIRSUFFIX@@;'"${LIBDIRSUFFIX}"';g' \
+  -e 's;@@BITS@@;'"${BITS}"';g' \
   < ${CWD}/win-builds-switch.in \
   > $PKG/bin/win-builds-switch
 

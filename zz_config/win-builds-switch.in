@@ -54,5 +54,5 @@ else
   export PKG_CONFIG_LIBDIR
   echo 'Set ${PKG_CONFIG_LIBDIR}='"${PKG_CONFIG_LIBDIR}"'.' 1>&2
 
-  replace_in_path "/opt/${SERIES}_??/bin" "/opt/${SERIES}_../bin" "/${PREFIX}/bin"
+  replace_in_path "/opt/${SERIES}_??/bin" "/opt/${SERIES}_../bin" "/opt/${SERIES}_@@BITS@@/bin"
 fi
