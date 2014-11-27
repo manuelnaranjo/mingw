@@ -52,6 +52,9 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
+# The build process will attempt to link against libpthread.a before we've
+# built it. It doesn't need any symbol from it however and we can simply provid
+# it with an empty library, here libm.a.
 if [ x"${HOST_TRIPLET}" != x"${TARGET_TRIPLET}" ]; then
   mkdir -p fakelib
   cp "/${PREFIX}/${TARGET_TRIPLET}/lib${LIBDIRSUFFIX_TGT}/libm.a" fakelib/libpthread.a
