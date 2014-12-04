@@ -48,7 +48,7 @@ CFLAGS="-O2" \
 CXXFLAGS="-O2" \
 ./configure \
   --prefix=/${PREFIX} \
-  --libdir=/${PREFIX}/lib${LIBDIRSUFFIX_TGT} \
+  --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
   --sysconfdir=/${PREFIX}/etc \
   --localstatedir=/${PREFIX}/var \
   --infodir=/${PREFIX}/info \
