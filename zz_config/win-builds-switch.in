@@ -36,10 +36,17 @@ put_toolchain_in_path() {
   local BASE="${1}"
   local BITS="${2}"
 
+  local BASE2
+  if [ -n "${BITS}" ]; then
+    BASE2="${BASE}_"
+  else
+    BASE2="${BASE}"
+  fi
+
   replace_in_path \
-    "/opt/${BASE}_??/bin" \
-    "/opt/${BASE}_../bin" \
-    "/opt/${BASE}_${BITS}/bin"
+    "/opt/${BASE2}??/bin" \
+    "/opt/${BASE2}../bin" \
+    "/opt/${BASE2}${BITS}/bin"
 }
 
 unset PKG_CONFIG_PATH
@@ -59,6 +66,7 @@ else
     # Cygwin, Linux, possibly any other
     PKG_CONFIG_LIBDIR="@@YYPREFIX_TARGET@@/lib@@LIBDIRSUFFIX@@/pkgconfig"
     put_toolchain_in_path "cross_toolchain" "@@BITS@@"
+    put_toolchain_in_path "windows" ""
   fi
 
   export PKG_CONFIG_LIBDIR
