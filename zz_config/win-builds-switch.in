@@ -32,6 +32,16 @@ replace_in_path() {
   echo 'Set ${PATH}='"${PATH}"'.' 1>&2
 }
 
+put_toolchain_in_path() {
+  local BASE="${1}"
+  local BITS="${2}"
+
+  replace_in_path \
+    "/opt/${BASE}_??/bin" \
+    "/opt/${BASE}_../bin" \
+    "/opt/${BASE}_${BITS}/bin"
+}
+
 unset PKG_CONFIG_PATH
 echo 'Unset ${PKG_CONFIG_LIBDIR}.' 1>&2
 
@@ -44,15 +54,13 @@ else
   if ! grep '^\(CYGWIN\|Linux\)' /proc/version >/dev/null 2>/dev/null; then
     # MSYS
     PKG_CONFIG_LIBDIR="!{YYPREFIX}/lib@@LIBDIRSUFFIX@@/pkgconfig"
-    SERIES="windows"
+    put_toolchain_in_path "windows" "@@BITS@@"
   else
     # Cygwin, Linux, possibly any other
     PKG_CONFIG_LIBDIR="@@YYPREFIX_TARGET@@/lib@@LIBDIRSUFFIX@@/pkgconfig"
-    SERIES="cross_toolchain"
+    put_toolchain_in_path "cross_toolchain" "@@BITS@@"
   fi
 
   export PKG_CONFIG_LIBDIR
   echo 'Set ${PKG_CONFIG_LIBDIR}='"${PKG_CONFIG_LIBDIR}"'.' 1>&2
-
-  replace_in_path "/opt/${SERIES}_??/bin" "/opt/${SERIES}_../bin" "/opt/${SERIES}_@@BITS@@/bin"
 fi
