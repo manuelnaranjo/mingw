@@ -66,7 +66,7 @@ else
     # Cygwin, Linux, possibly any other
     PKG_CONFIG_LIBDIR="@@YYPREFIX_TARGET@@/lib@@LIBDIRSUFFIX@@/pkgconfig"
     put_toolchain_in_path "cross_toolchain" "@@BITS@@"
-    put_toolchain_in_path "windows" ""
+    put_toolchain_in_path "native_toolchain" ""
   fi
 
   export PKG_CONFIG_LIBDIR
