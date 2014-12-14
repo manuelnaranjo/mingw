@@ -67,6 +67,10 @@ else
     PKG_CONFIG_LIBDIR="@@YYPREFIX_TARGET@@/lib@@LIBDIRSUFFIX@@/pkgconfig"
     put_toolchain_in_path "cross_toolchain" "@@BITS@@"
     put_toolchain_in_path "native_toolchain" ""
+    export QMAKEPATH="@@YYPREFIX@@"
+    echo 'Set ${QMAKEPATH}='"${QMAKEPATH}"'.' 1>&2
+    export QMAKESPEC="win32-g++"
+    echo 'Set ${QMAKESPEC}='"${QMAKESPEC}"'.' 1>&2
   fi
 
   export PKG_CONFIG_LIBDIR

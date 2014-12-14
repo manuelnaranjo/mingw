@@ -4,6 +4,15 @@
   (description  "Configuration package for Win-builds") (host %{HST})
   (target (%{TGT})) (predicates ()) (comments ()))
  (
+  (symlink (Symlink (%{YYPREFIX_NATIVE}/bin/qmake-poisoned bin/qmake File)))
+  (symlink (Symlink (%{YYPREFIX_TARGET}/mkspecs/common mkspecs/common Directory)))
+  (symlink (Symlink (%{YYPREFIX_TARGET}/mkspecs/features mkspecs/features Directory)))
+  (symlink (Symlink (%{YYPREFIX_TARGET}/mkspecs/modules mkspecs/modules Directory)))
+  (symlink (Symlink (%{YYPREFIX_TARGET}/mkspecs/win32-g++/qplatformdefs.h mkspecs/win32-g++/qplatformdefs.h File)))
+  (symlink (Symlink (%{YYPREFIX_TARGET}/mkspecs/qconfig.pri mkspecs/qconfig.pri File)))
+  (symlink (Symlink (%{YYPREFIX_TARGET}/mkspecs/qdevice.pri mkspecs/qdevice.pri File)))
+  (symlink (Symlink (%{YYPREFIX_TARGET}/mkspecs/qfeatures.pri mkspecs/qfeatures.pri File)))
+  (symlink (Symlink (%{YYPREFIX_TARGET}/mkspecs/qmodule.pri mkspecs/qmodule.pri File)))
   (yyprefix_store
      (SearchReplace ("bin/win-builds-switch" "!{YYPREFIX}" "${YYPREFIX}")))
   (fc-cache-can-fail (Exec (${YYPREFIX}/bin/fc-cache)))

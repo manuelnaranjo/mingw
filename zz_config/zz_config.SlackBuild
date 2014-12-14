@@ -25,6 +25,8 @@ PKGNAM=zz_config
 VERSION=1.0.0
 BUILD=${BUILD:-3}
 
+set -e
+
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-$PKGNAM
@@ -44,6 +46,7 @@ esac
 
 sed \
   -e 's;@@PREFIX@@;'"${PREFIX}"';g' \
+  -e 's;@@YYPREFIX@@;'"${YYPREFIX}"';g' \
   -e 's;@@YYPREFIX_TARGET@@;'"${YYPREFIX_TARGET:-${YYPREFIX}}"';g' \
   -e 's;@@LIBDIRSUFFIX@@;'"${LIBDIRSUFFIX_TGT}"';g' \
   -e 's;@@BITS@@;'"${BITS}"';g' \
@@ -52,11 +55,52 @@ sed \
 
 chmod +x $PKG/bin/win-builds-switch
 
-cat ${CWD}/${PKGNAM}.yypkg.script | sed \
-  -e "s/%{PKG}/${PKGNAM}/" \
-  -e "s/%{HST}/${HOST_TRIPLET}/" \
-  -e "s/%{TGT}//" \
-  -e "s/%{VER}/${VERSION}/" \
-  -e "s/%{BUILD}/${BUILD}/" \
+# For cross-compilation, we need to hold qmake's hand a lot and strongly.
+if [ x"${TARGET_TRIPLET}" != x"${HOST_TRIPLET}" ]; then
+  mkdir -p $PKG/bin $PKG/mkspecs/win32-g++
+
+  # Symlink qmake so that it will look inside the current bin/ for its qt.conf
+  # file when running. The "-poison" in the name is to make sure the wrong one
+  # isn't used when PATH holds both $YYPREFIX_NATIVE/bin and
+  # $YYPREFIX_CROSS/bin.
+  ln -s "${YYPREFIX_NATIVE}/bin/qmake-poisoned" "${PKG}/bin/qmake"
+
+  sed \
+    -e 's;@@TARGET_TRIPLET@@;'"${TARGET_TRIPLET}"';g' \
+    -e 's;@@YYPREFIX_TARGET@@;'"${YYPREFIX_TARGET}"';g' \
+    -e 's;@@LIBDIRSUFFIX@@;'"${LIBDIRSUFFIX_TGT}"';g' \
+    < ${CWD}/qmake.conf.in \
+    > $PKG/mkspecs/win32-g++/qmake.conf
+
+  cat > ${PKG}/bin/qt.conf << EOF
+[Paths]
+  Prefix=${YYPREFIX_NATIVE}
+  Binaries=${YYPREFIX_NATIVE}/bin
+  Headers=${YYPREFIX_TARGET}/include/qt5
+EOF
+
+  # This is how I wish I had done it but yypkg makes all symlinks relative,
+  # including those that point outside of the current prefix. Maybe this can be
+  # improved on yypkg's side. For now (RC stage), create the symlinks from
+  # zz_config.yypkg.script instead.
+  # for f in common features modules q{config,device,features,module}.pri win32-g++/qplatformdefs.h; do
+  #   ln -s "${YYPREFIX_TARGET}/mkspecs/${f}" "${PKG}/mkspecs/${f}"
+  # done
+else
+  # We don't want these symlinks when not in the cross_toolchain series so
+  # filter them out.
+  FILTER_OUT_QMAKE_SYMLINKS="qmake\\|mkspecs"
+fi
+
+cat ${CWD}/${PKGNAM}.yypkg.script \
+  | grep -v "${FILTER_OUT_QMAKE_SYMLINKS:-"dontmatchanything"}" \
+  | sed \
+  -e "s;%{PKG};${PKGNAM};" \
+  -e "s;%{HST};${HOST_TRIPLET};" \
+  -e "s;%{TGT};;" \
+  -e "s;%{VER};${VERSION};" \
+  -e "s;%{BUILD};${BUILD};" \
+  -e "s;%{YYPREFIX_TARGET};${YYPREFIX_TARGET};" \
+  -e "s;%{YYPREFIX_NATIVE};${YYPREFIX_NATIVE};" \
   | yypkg --makepkg --output ${YYOUTPUT} --script - --directory "${PKG}"
 
