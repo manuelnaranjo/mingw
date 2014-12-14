@@ -19,6 +19,11 @@
 #_
 #_!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+EMULATE="$(emulate)"
+if [ -n "${EMULATE}" ]; then
+  emulate sh
+fi
+
 replace_in_path() {
   local GLOB="${1}"
   local RE="${2}"
@@ -79,4 +84,8 @@ else
 
   export PKG_CONFIG_LIBDIR
   echo 'Set ${PKG_CONFIG_LIBDIR}='"${PKG_CONFIG_LIBDIR}"'.' 1>&2
+fi
+
+if [ -n "${EMULATE}" ]; then
+  emulate "${EMULATE}"
 fi
