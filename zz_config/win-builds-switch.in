@@ -36,17 +36,21 @@ put_toolchain_in_path() {
   local BASE="${1}"
   local BITS="${2}"
 
-  local BASE2
+  local GLOB RE REPLACEMENT
   if [ -n "${BITS}" ]; then
-    BASE2="${BASE}_"
+    GLOB="${BASE}_??"
+    RE="${BASE}_.."
+    REPLACEMENT="${BASE}_${BITS}"
   else
-    BASE2="${BASE}"
+    GLOB="${BASE}"
+    RE="${BASE}"
+    REPLACEMENT="${BASE}"
   fi
 
   replace_in_path \
-    "/opt/${BASE2}??/bin" \
-    "/opt/${BASE2}../bin" \
-    "/opt/${BASE2}${BITS}/bin"
+    "/opt/${GLOB}/bin" \
+    "/opt/${RE}/bin" \
+    "/opt/${REPLACEMENT}/bin"
 }
 
 unset PKG_CONFIG_PATH
