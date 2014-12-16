@@ -48,7 +48,7 @@ sed \
   -e 's;@@PREFIX@@;'"${PREFIX}"';g' \
   -e 's;@@YYPREFIX@@;'"${YYPREFIX}"';g' \
   -e 's;@@YYPREFIX_TARGET@@;'"${YYPREFIX_TARGET:-${YYPREFIX}}"';g' \
-  -e 's;@@LIBDIRSUFFIX@@;'"${LIBDIRSUFFIX_TGT}"';g' \
+  -e 's;@@LIBDIRSUFFIX@@;'"${LIBDIRSUFFIX_TGT:-${LIBDIRSUFFIX}}"';g' \
   -e 's;@@BITS@@;'"${BITS}"';g' \
   < ${CWD}/win-builds-switch.in \
   > $PKG/bin/win-builds-switch
