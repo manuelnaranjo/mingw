@@ -19,7 +19,7 @@
 #_
 #_!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-EMULATE="$(emulate)"
+EMULATE="$(emulate)" || true
 if [ -n "${EMULATE}" ]; then
   emulate sh
 fi
