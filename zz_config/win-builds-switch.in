@@ -19,7 +19,7 @@
 #_
 #_!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-EMULATE="$(emulate)" || true
+EMULATE="$(emulate 2>/dev/null)" || true
 if [ -n "${EMULATE}" ]; then
   emulate sh
 fi
