@@ -19,8 +19,8 @@
 #_
 #_!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-EMULATE="$(emulate 2>/dev/null)" || true
-if [ -n "${EMULATE}" ]; then
+if [ -n "${ZSH_VERSION}" ]; then
+  EMULATE="$(emulate)"
   emulate sh
 fi
 
