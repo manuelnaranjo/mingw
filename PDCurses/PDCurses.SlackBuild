@@ -1,0 +1,85 @@
+#!/bin/sh
+
+# Copyright 2005-2011  Patrick J. Volkerding, Sebeka, Minnesota, USA
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
+#  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+PKGNAM=PDCurses
+VERSION=${VERSION:-$(find $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
+BUILD=${BUILD:-2}
+
+NUMJOBS=${NUMJOBS:-" -j7 "}
+
+CWD=$(pwd)
+TMP=${TMP:-/tmp}
+PKG=$TMP/package-$PKGNAM
+
+set -e
+
+rm -rf $PKG
+mkdir -p $TMP $PKG
+
+cd $TMP
+rm -rf $PKGNAM-$VERSION
+tar xvf $CWD/$PKGNAM-$VERSION.tar.gz
+cd $PKGNAM-$VERSION
+
+chown -R root:root .
+chmod -R u+w,go+r-w,a-s .
+
+mv curses.h curses.h.old
+(echo '#define PDC_DLL_BUILD 1' && cat curses.h.old) > curses.h
+
+sed -i \
+  -e 's/\<\(gcc\|strip\)\>/'"${HOST_TRIPLET}"'-\1/g' \
+  win32/gccwin32.mak
+
+M="make -C win32 -f gccwin32.mak WIDE=Y DLL=Y"
+$M $NUMJOBS || $M
+
+make -C doc
+
+mkdir -p $PKG/${PREFIX} \
+mkdir -p $PKG/${PREFIX}/{bin,lib${LIBDIRSUFFIX},include,doc/$PKGNAM-$VERSION}
+(cd win32 && cp *.dll *.exe $PKG/${PREFIX}/bin)
+cp *.h $PKG/${PREFIX}/include
+cp HISTORY IMPLEMNT README doc/PDCurses.txt $PKG/${PREFIX}/doc/$PKGNAM-$VERSION
+cp README $PKG/${PREFIX}/doc/$PKGNAM-$VERSION/README.win32
+ln -s pdcurses.dll $PKG/${PREFIX}/ncurses.dll
+ln -s ../bin/pdcurses.dll $PKG/${PREFIX}/lib${LIBDIRSUFFIX}/pdcurses.dll
+ln -s ../bin/pdcurses.dll $PKG/${PREFIX}/lib${LIBDIRSUFFIX}/ncurses.dll
+
+find $PKG | xargs file | grep -e "executable" -e "shared object" \
+  | grep ${TARGET_EXE_FORMAT} | cut -f 1 -d : \
+  | xargs ${TARGET_STRIP} --strip-unneeded 2> /dev/null || true
+
+# Compress info pages
+if [ -e $PKG/${PREFIX}/info ]; then
+  rm -f $PKG/${PREFIX}/info/dir
+  gzip -9 $PKG/${PREFIX}/info/*
+fi
+
+cat ${CWD}/$PKGNAM.yypkg.script | sed \
+  -e "s/%{PKG}/${PKGNAM}/" \
+  -e "s/%{HST}/${HOST_TRIPLET}/" \
+  -e "s/%{TGT}//" \
+  -e "s/%{VER}/${VERSION}/" \
+  -e "s/%{BUILD}/${BUILD}/" \
+  | yypkg --makepkg --output ${YYOUTPUT} --script - --directory "${PKG}/${PREFIX}"
+
